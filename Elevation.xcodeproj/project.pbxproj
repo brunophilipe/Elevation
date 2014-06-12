@@ -1,0 +1,141 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		155FF29E194A228600D0EF67 /* elevation.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = elevation.c; sourceTree = "<group>"; };
+		155FF29F194A228600D0EF67 /* elevation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = elevation.h; sourceTree = "<group>"; };
+		155FF2A0194A228600D0EF67 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		155FF2A1194A228600D0EF67 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		155FF298194A228600D0EF67 = {
+			isa = PBXGroup;
+			children = (
+				155FF29E194A228600D0EF67 /* elevation.c */,
+				155FF29F194A228600D0EF67 /* elevation.h */,
+				155FF2A0194A228600D0EF67 /* main.c */,
+				155FF2A1194A228600D0EF67 /* Makefile */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		155FF29D194A228600D0EF67 /* Elevation */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 155FF2A2194A228600D0EF67 /* Build configuration list for PBXLegacyTarget "Elevation" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/bruno/Workspace/Games/Elevation;
+			dependencies = (
+			);
+			name = Elevation;
+			passBuildSettingsInEnvironment = 1;
+			productName = Elevation;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		155FF299194A228600D0EF67 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+			};
+			buildConfigurationList = 155FF29C194A228600D0EF67 /* Build configuration list for PBXProject "Elevation" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 155FF298194A228600D0EF67;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				155FF29D194A228600D0EF67 /* Elevation */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		155FF29A194A228600D0EF67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		155FF29B194A228600D0EF67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		155FF2A3194A228600D0EF67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = Elevation;
+			};
+			name = Debug;
+		};
+		155FF2A4194A228600D0EF67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = Elevation;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		155FF29C194A228600D0EF67 /* Build configuration list for PBXProject "Elevation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				155FF29A194A228600D0EF67 /* Debug */,
+				155FF29B194A228600D0EF67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		155FF2A2194A228600D0EF67 /* Build configuration list for PBXLegacyTarget "Elevation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				155FF2A3194A228600D0EF67 /* Debug */,
+				155FF2A4194A228600D0EF67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 155FF299194A228600D0EF67 /* Project object */;
+}
