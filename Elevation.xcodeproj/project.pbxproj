@@ -49,9 +49,9 @@
 		155FF298194A228600D0EF67 = {
 			isa = PBXGroup;
 			children = (
-				155FF29E194A228600D0EF67 /* elevation.c */,
-				155FF29F194A228600D0EF67 /* elevation.h */,
 				155FF2A0194A228600D0EF67 /* main.c */,
+				155FF29F194A228600D0EF67 /* elevation.h */,
+				155FF29E194A228600D0EF67 /* elevation.c */,
 				155FF2A1194A228600D0EF67 /* Makefile */,
 				15EEAE16194A279A00A66BBF /* README.md */,
 				15EEAE0C194A256B00A66BBF /* Elevation-clt */,
