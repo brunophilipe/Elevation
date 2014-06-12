@@ -134,7 +134,7 @@ int _cabShouldMove(int cabindex, cabdir_t direction)
 		}
 		if (chosenDirection == 0) {
 			// Check for calls in the opposite direction as cab movement
-			for (int f = array_shaftsRange[shaft].min; f <= cab.curfloor; f++)
+			for (int f = array_shaftsRange[shaft].min; f < cab.curfloor; f++)
 			{
 				if (cab.calls_out[f] & kElevationCallGoUp) {
 					chosenDirection = kElevationCabDirectionDown;
@@ -144,10 +144,21 @@ int _cabShouldMove(int cabindex, cabdir_t direction)
 		}
 	}
 
+	// Check for other outside calls
+	if (chosenDirection == 0) {
+		for (int f = array_shaftsRange[shaft].min; f <= array_shaftsRange[shaft].max; f++)
+		{
+			if (cab.calls_out[f] > 0) {
+				chosenDirection = (f < cab.curfloor ? kElevationCabDirectionDown : kElevationCabDirectionUp);
+				break;
+			}
+		}
+	}
+
 	// No requests to answer, go back to rest floor
 	if (chosenDirection == 0 && cab.restFloor > cab.curfloor) {
 		chosenDirection = kElevationCabDirectionUp;
-	} else if (cab.restFloor < cab.curfloor) {
+	} else if (chosenDirection == 0 && cab.restFloor < cab.curfloor) {
 		chosenDirection = kElevationCabDirectionDown;
 	}
 
@@ -215,15 +226,28 @@ void elevation_destroy()
 void elevation_tick()
 {
 	cabinfo_t *cab;
+
 	for (int i = 0; i < count_totalCabs; ++i)
 	{
 		cab = &array_cabs[i];
 
-		if (cab->calls_in[cab->curfloor] > 0)
+		if (cab->calls_in[cab->curfloor] > 0 || (_cabShouldMove(i, cab->direction) == 0 && cab->restFloor == cab->curfloor))
 		{
 			cab->calls_in[cab->curfloor] = 0;
+
+			if (!cab->stopped) {
+				printf("Cab %d stopped at floor %d\n", i, cab->curfloor);
+			}
 			cab->stopped = 1;
-			printf("Cab %d stopped at floor %d\n", i, cab->curfloor);
+		}
+		else if (cab->calls_out[cab->curfloor] == (cab->direction == kElevationCabDirectionUp ? kElevationCallGoUp : kElevationCallGoDown))
+		{
+			cab->calls_out[cab->curfloor] &= (cab->direction == kElevationCabDirectionUp ? ~kElevationCallGoUp : ~kElevationCallGoDown);
+
+			if (!cab->stopped) {
+				printf("Cab %d stopped at floor %d\n", i, cab->curfloor);
+			}
+			cab->stopped = 1;
 		}
 		else
 		{
@@ -236,10 +260,11 @@ void elevation_tick()
 						cab->stopped = 0;
 					}
 					else if (_cabShouldMove(i, kElevationCabDirectionDown) < 0)
-					{
+//					{
 						cab->direction = kElevationCabDirectionDown;
-						cab->curfloor--;
-					}
+//						cab->curfloor--;
+//						cab->stopped = 0;
+//					}
 					break;
 
 				case kElevationCabDirectionDown:
@@ -249,10 +274,11 @@ void elevation_tick()
 						cab->stopped = 0;
 					}
 					else if (_cabShouldMove(i, kElevationCabDirectionUp) > 0)
-					{
+//					{
 						cab->direction = kElevationCabDirectionUp;
-						cab->curfloor++;
-					}
+//						cab->curfloor++;
+//						cab->stopped = 0;
+//					}
 					break;
 			}
 		}
@@ -306,7 +332,7 @@ void elevation_call_floor(int floor, int shaft, cabdir_t direction)
 		}
 	}
 
-	array_cabs[leastLoadedIndex].calls_in[floor] |= (direction == kElevationCabDirectionUp ? kElevationCallGoUp : kElevationCallGoDown);
+	array_cabs[leastLoadedIndex].calls_out[floor] |= (direction == kElevationCabDirectionUp ? kElevationCallGoUp : kElevationCallGoDown);
 
 	free(distances);
 	free(loads);
