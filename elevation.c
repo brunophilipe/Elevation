@@ -101,7 +101,7 @@ int _cabShouldMove(int cabindex, cabdir_t direction)
 	}
 
 	// Answer requests from the outside
-	if (direction == kElevationCabDirectionUp)
+	if (chosenDirection == 0 && direction == kElevationCabDirectionUp)
 	{
 		// Check for calls in the same direction as cab movement
 		for (int f = cab.curfloor+1; f <= array_shaftsRange[shaft].max; f++)
@@ -122,7 +122,7 @@ int _cabShouldMove(int cabindex, cabdir_t direction)
 			}
 		}
 	}
-	else if (direction == kElevationCabDirectionDown)
+	else if (chosenDirection == 0 && direction == kElevationCabDirectionDown)
 	{
 		// Check for calls in the same direction from top to the bottom (because we're going down!)
 		for (int f = cab.curfloor; f >= array_shaftsRange[shaft].min; f--)
@@ -151,7 +151,7 @@ int _cabShouldMove(int cabindex, cabdir_t direction)
 		chosenDirection = kElevationCabDirectionDown;
 	}
 
-	return 0;
+	return chosenDirection;
 }
 
 #pragma mark - Master Functions
