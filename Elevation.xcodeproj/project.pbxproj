@@ -32,6 +32,7 @@
 		155FF2A1194A228600D0EF67 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		15EEAE0A194A256B00A66BBF /* Elevation-clt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Elevation-clt"; sourceTree = BUILT_PRODUCTS_DIR; };
 		15EEAE0F194A256B00A66BBF /* Elevation_clt.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Elevation_clt.1; sourceTree = "<group>"; };
+		15EEAE16194A279A00A66BBF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +53,7 @@
 				155FF29F194A228600D0EF67 /* elevation.h */,
 				155FF2A0194A228600D0EF67 /* main.c */,
 				155FF2A1194A228600D0EF67 /* Makefile */,
+				15EEAE16194A279A00A66BBF /* README.md */,
 				15EEAE0C194A256B00A66BBF /* Elevation-clt */,
 				15EEAE0B194A256B00A66BBF /* Products */,
 			);
