@@ -222,6 +222,9 @@ void elevation_destroy()
 	free(array_cabs);
 }
 
+/**
+ *  Ticks the simulator. After each tick each cab moves one floor if it needs to.
+ */
 void elevation_tick()
 {
 	cabinfo_t *cab;
@@ -297,6 +300,13 @@ void elevation_tick()
 
 #pragma mark - Operation Functions
 
+/**
+ *  Sets a request on a shaft from a floor.
+ *
+ *  @param floor     The floor where the request was made.
+ *  @param shaft     The index of the shaft the requester sent the request to.
+ *  @param direction If the request is to go up or down.
+ */
 void elevation_call_floor(int floor, int shaft, cabdir_t direction)
 {
 	// Find best cab in shaft to serve the floor
@@ -348,6 +358,13 @@ void elevation_call_floor(int floor, int shaft, cabdir_t direction)
 	free(loads);
 }
 
+/**
+ *  Sets a request on a floor from within a cab.
+ *
+ *  @param floor The floor to which the requester demands to go.
+ *  @param shaft The index of the shaft containing the cab from which the request was sent.
+ *  @param cab   The index of the cab within the cabs of the parameter shaft.
+ */
 void elevation_call_cab(int floor, int shaft, int cab)
 {
 	array_cabs[_cabindex(shaft, cab)].calls_in[floor] = 1;
@@ -417,6 +434,9 @@ int elevation_cab_decrement_load(int shaft, int cab)
 void elevation_shaft_set_range(int shaft, tuple_range range)
 {
 	array_shaftsRange[shaft] = range;
+	if (range.max > count_floors) {
+		count_floors = range.max;
+	}
 }
 
 tuple_range elevation_shaft_get_range(int shaft)
