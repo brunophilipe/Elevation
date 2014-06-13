@@ -7,7 +7,7 @@
 typedef struct
 {
 	int direction;
-	int curfloor;
+	int curFloor;
 	int restFloor;
 	short load;
 	short stopped;
@@ -77,7 +77,7 @@ int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 	// Answer requests from inside the cab first
 	if (direction == kElevationCabDirectionUp)
 	{
-		for (int f = cab.curfloor+1; f <= array_shaftsRange[shaft].max; f++)
+		for (int f = cab.curFloor+1; f <= array_shaftsRange[shaft].max; f++)
 		{
 			if (cab.calls_in[f] > 0)
 			{
@@ -89,7 +89,7 @@ int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 	}
 	else if (direction == kElevationCabDirectionDown)
 	{
-		for (int f = cab.curfloor; f >= array_shaftsRange[shaft].min; f--)
+		for (int f = cab.curFloor; f >= array_shaftsRange[shaft].min; f--)
 		{
 			if (cab.calls_in[f] > 0)
 			{
@@ -104,7 +104,7 @@ int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 	if (chosenDirection == 0 && direction == kElevationCabDirectionUp)
 	{
 		// Check for calls in the same direction as cab movement
-		for (int f = cab.curfloor+1; f <= array_shaftsRange[shaft].max; f++)
+		for (int f = cab.curFloor+1; f <= array_shaftsRange[shaft].max; f++)
 		{
 			if (cab.calls_out[f] & kElevationCallGoUp) {
 				chosenDirection = kElevationCabDirectionUp;
@@ -115,7 +115,7 @@ int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 
 	if (chosenDirection == 0 && direction == kElevationCabDirectionUp) {
 		// Check for calls in the oposite direction from top to the bottom
-		for (int f = array_shaftsRange[shaft].max; f >= cab.curfloor; f--)
+		for (int f = array_shaftsRange[shaft].max; f >= cab.curFloor; f--)
 		{
 			if (cab.calls_out[f] & kElevationCallGoDown) {
 				chosenDirection = kElevationCabDirectionUp;
@@ -127,7 +127,7 @@ int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 	if (chosenDirection == 0 && direction == kElevationCabDirectionDown)
 	{
 		// Check for calls in the same direction from top to the bottom (because we're going down!)
-		for (int f = cab.curfloor; f >= array_shaftsRange[shaft].min; f--)
+		for (int f = cab.curFloor; f >= array_shaftsRange[shaft].min; f--)
 		{
 			if (cab.calls_out[f] & kElevationCallGoDown) {
 				chosenDirection = kElevationCabDirectionDown;
@@ -138,7 +138,7 @@ int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 
 	if (chosenDirection == 0 && direction == kElevationCabDirectionDown) {
 		// Check for calls in the opposite direction as cab movement
-		for (int f = array_shaftsRange[shaft].min; f < cab.curfloor; f++)
+		for (int f = array_shaftsRange[shaft].min; f < cab.curFloor; f++)
 		{
 			if (cab.calls_out[f] & kElevationCallGoUp) {
 				chosenDirection = kElevationCabDirectionDown;
@@ -149,9 +149,9 @@ int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 
 	if (!ignoreRestFloor) {
 		// No requests to answer, go back to rest floor
-		if (chosenDirection == 0 && cab.restFloor > cab.curfloor) {
+		if (chosenDirection == 0 && cab.restFloor > cab.curFloor) {
 			chosenDirection = kElevationCabDirectionUp;
-		} else if (chosenDirection == 0 && cab.restFloor < cab.curfloor) {
+		} else if (chosenDirection == 0 && cab.restFloor < cab.curFloor) {
 			chosenDirection = kElevationCabDirectionDown;
 		}
 	}
@@ -183,9 +183,10 @@ void elevation_init(int lshafts, int *lcabs, int lfloors, tuple_range *lshaftRan
 	array_cabsCount = malloc(sizeof(int) * count_shafts);
 	memcpy(array_cabsCount, lcabs, sizeof(int) * count_shafts);
 
-	array_cabs = malloc(sizeof(cabinfo_t) * count_totalCabs);
-
 	array_shaftsRange = malloc(sizeof(tuple_range) * lshafts);
+	memcpy(array_shaftsRange, lshaftRanges, sizeof(tuple_range) * count_shafts);
+
+	array_cabs = malloc(sizeof(cabinfo_t) * count_totalCabs);
 
 	for (int s = 0; s < count_shafts; ++s)
 	{
@@ -195,7 +196,7 @@ void elevation_init(int lshafts, int *lcabs, int lfloors, tuple_range *lshaftRan
 			printf("Initializing cab %d\n", _cabindex(s, c));
 
 			array_cabs[_cabindex(s, c)].direction = kElevationCabDirectionUp;
-			array_cabs[_cabindex(s, c)].curfloor = lshaftRanges[s].min;
+			array_cabs[_cabindex(s, c)].curFloor = lshaftRanges[s].min;
 			array_cabs[_cabindex(s, c)].restFloor = lshaftRanges[s].min;
 			array_cabs[_cabindex(s, c)].load = 0;
 
@@ -218,6 +219,11 @@ void elevation_init(int lshafts, int *lcabs, int lfloors, tuple_range *lshaftRan
 
 void elevation_destroy()
 {
+	for (int i=0; i<count_totalCabs; i++) {
+		free(array_cabs[i].calls_in);
+		free(array_cabs[i].calls_out);
+	}
+
 	free(array_cabsCount);
 	free(array_cabs);
 }
@@ -233,32 +239,32 @@ void elevation_tick()
 	{
 		cab = &array_cabs[i];
 
-		if (cab->calls_in[cab->curfloor] > 0 || (_cabShouldMove(i, cab->direction) == 0 && cab->restFloor == cab->curfloor))
+		if (cab->calls_in[cab->curFloor] > 0 || (_cabShouldMove(i, cab->direction) == 0 && cab->restFloor == cab->curFloor))
 		{
-			cab->calls_in[cab->curfloor] = 0;
+			cab->calls_in[cab->curFloor] = 0;
 
 			if (!cab->stopped) {
-				printf("Cab %d stopped at floor %d\n", i, cab->curfloor);
+				printf("Cab %d stopped at floor %d\n", i, cab->curFloor);
 			}
 			cab->stopped = 1;
 		}
-		else if (cab->calls_out[cab->curfloor] > 0)
+		else if (cab->calls_out[cab->curFloor] > 0)
 		{
-			if (cab->calls_out[cab->curfloor] == kElevationCallGoUp && cab->direction == kElevationCabDirectionUp)
+			if (cab->calls_out[cab->curFloor] == kElevationCallGoUp && cab->direction == kElevationCabDirectionUp)
 			{
-				cab->calls_out[cab->curfloor] &= ~kElevationCallGoUp;
+				cab->calls_out[cab->curFloor] &= ~kElevationCallGoUp;
 			}
-			else if (cab->calls_out[cab->curfloor] == kElevationCallGoDown && cab->direction == kElevationCabDirectionDown)
+			else if (cab->calls_out[cab->curFloor] == kElevationCallGoDown && cab->direction == kElevationCabDirectionDown)
 			{
-				cab->calls_out[cab->curfloor] &= ~kElevationCallGoDown;
+				cab->calls_out[cab->curFloor] &= ~kElevationCallGoDown;
 			}
 			else if (_cabShouldMoveLong(i, kElevationCabDirectionUp, 1) == 0)
 			{
-				cab->calls_out[cab->curfloor] = 0;
+				cab->calls_out[cab->curFloor] = 0;
 			}
 
 			if (!cab->stopped) {
-				printf("Cab %d stopped at floor %d\n", i, cab->curfloor);
+				printf("Cab %d stopped at floor %d\n", i, cab->curFloor);
 			}
 			cab->stopped = 1;
 		}
@@ -269,29 +275,29 @@ void elevation_tick()
 				case kElevationCabDirectionUp:
 					if (_cabShouldMove(i, kElevationCabDirectionUp) > 0)
 					{
-						cab->curfloor++;
+						cab->curFloor++;
 						cab->stopped = 0;
 					}
 					else if (_cabShouldMove(i, kElevationCabDirectionDown) < 0)
-//					{
+						//					{
 						cab->direction = kElevationCabDirectionDown;
-//						cab->curfloor--;
-//						cab->stopped = 0;
-//					}
+					//						cab->curFloor--;
+					//						cab->stopped = 0;
+					//					}
 					break;
 
 				case kElevationCabDirectionDown:
 					if (_cabShouldMove(i, kElevationCabDirectionDown) < 0)
 					{
-						cab->curfloor--;
+						cab->curFloor--;
 						cab->stopped = 0;
 					}
 					else if (_cabShouldMove(i, kElevationCabDirectionUp) > 0)
-//					{
+						//					{
 						cab->direction = kElevationCabDirectionUp;
-//						cab->curfloor++;
-//						cab->stopped = 0;
-//					}
+					//						cab->curFloor++;
+					//						cab->stopped = 0;
+					//					}
 					break;
 			}
 		}
@@ -321,7 +327,7 @@ void elevation_call_floor(int floor, int shaft, cabdir_t direction)
 		cab = &array_cabs[_cabindex(shaft, i)];
 
 		// If the cab is stopped at the floor, give it the request
-		if (cab->stopped && cab->curfloor == floor) {
+		if (cab->stopped && cab->curFloor == floor) {
 			cab->calls_out[floor] |= (direction == kElevationCabDirectionUp ? kElevationCallGoUp : kElevationCallGoDown);
 			break;
 		}
@@ -329,12 +335,29 @@ void elevation_call_floor(int floor, int shaft, cabdir_t direction)
 		// If not lets find the closest cab
 		if (cab->direction == direction || cab->stopped)
 		{
-			if (direction == kElevationCabDirectionUp && cab->curfloor <= floor) {
-				distances[i] = floor - cab->curfloor;
-			} else if (direction == kElevationCabDirectionDown && cab->curfloor >= floor) {
-				distances[i] = cab->curfloor - floor;
+			distances[i] = abs(cab->curFloor - floor);
+		} else {
+			int highestCall = -1, lowestCall = -1;
+
+			for (int f = array_shaftsRange[shaft].min; f < array_shaftsRange[shaft].max; f++) {
+				if (cab->calls_in[f] > 0) {
+					if (lowestCall < 0) lowestCall = f;
+					highestCall = f;
+				}
+				if (cab->calls_out[f] != 0) {
+					if (lowestCall < 0) lowestCall= f;
+					highestCall = f;
+				}
+			}
+
+			if (highestCall > 0 && lowestCall > 0) {
+				distances[i] = (highestCall - cab->curFloor)+(highestCall - lowestCall)+(cab->curFloor - lowestCall);
+			} else {
+				distances[i] = abs(cab->curFloor - floor);
 			}
 		}
+
+		loads[i] = cab->load;
 	}
 
 	// Check for shortest distance
@@ -372,7 +395,7 @@ void elevation_call_cab(int floor, int shaft, int cab)
 
 int elevation_cab_get_floor(int shaft, int cab)
 {
-	return array_cabs[_cabindex(shaft, cab)].curfloor;
+	return array_cabs[_cabindex(shaft, cab)].curFloor;
 }
 
 cabdir_t elevation_cab_get_direction(int shaft, int cab)
