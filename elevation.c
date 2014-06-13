@@ -67,7 +67,7 @@ int _shaftForCab(int cabindex)
 	return s-1;
 }
 
-int _cabShouldMove(int cabindex, cabdir_t direction)
+int _cabShouldMoveLong(int cabindex, cabdir_t direction, short ignoreRestFloor)
 {
 	cabinfo_t cab = array_cabs[cabindex];
 	cabdir_t chosenDirection = 0;
@@ -111,18 +111,20 @@ int _cabShouldMove(int cabindex, cabdir_t direction)
 				break;
 			}
 		}
-		if (chosenDirection == 0) {
-			// Check for calls in the oposite direction from top to the bottom
-			for (int f = array_shaftsRange[shaft].max; f >= cab.curfloor; f--)
-			{
-				if (cab.calls_out[f] & kElevationCallGoDown) {
-					chosenDirection = kElevationCabDirectionUp;
-					break;
-				}
+	}
+
+	if (chosenDirection == 0 && direction == kElevationCabDirectionUp) {
+		// Check for calls in the oposite direction from top to the bottom
+		for (int f = array_shaftsRange[shaft].max; f >= cab.curfloor; f--)
+		{
+			if (cab.calls_out[f] & kElevationCallGoDown) {
+				chosenDirection = kElevationCabDirectionUp;
+				break;
 			}
 		}
 	}
-	else if (chosenDirection == 0 && direction == kElevationCabDirectionDown)
+
+	if (chosenDirection == 0 && direction == kElevationCabDirectionDown)
 	{
 		// Check for calls in the same direction from top to the bottom (because we're going down!)
 		for (int f = cab.curfloor; f >= array_shaftsRange[shaft].min; f--)
@@ -132,37 +134,34 @@ int _cabShouldMove(int cabindex, cabdir_t direction)
 				break;
 			}
 		}
-		if (chosenDirection == 0) {
-			// Check for calls in the opposite direction as cab movement
-			for (int f = array_shaftsRange[shaft].min; f < cab.curfloor; f++)
-			{
-				if (cab.calls_out[f] & kElevationCallGoUp) {
-					chosenDirection = kElevationCabDirectionDown;
-					break;
-				}
-			}
-		}
 	}
 
-	// Check for other outside calls
-	if (chosenDirection == 0) {
-		for (int f = array_shaftsRange[shaft].min; f <= array_shaftsRange[shaft].max; f++)
+	if (chosenDirection == 0 && direction == kElevationCabDirectionDown) {
+		// Check for calls in the opposite direction as cab movement
+		for (int f = array_shaftsRange[shaft].min; f < cab.curfloor; f++)
 		{
-			if (cab.calls_out[f] > 0) {
-				chosenDirection = (f < cab.curfloor ? kElevationCabDirectionDown : kElevationCabDirectionUp);
+			if (cab.calls_out[f] & kElevationCallGoUp) {
+				chosenDirection = kElevationCabDirectionDown;
 				break;
 			}
 		}
 	}
 
-	// No requests to answer, go back to rest floor
-	if (chosenDirection == 0 && cab.restFloor > cab.curfloor) {
-		chosenDirection = kElevationCabDirectionUp;
-	} else if (chosenDirection == 0 && cab.restFloor < cab.curfloor) {
-		chosenDirection = kElevationCabDirectionDown;
+	if (!ignoreRestFloor) {
+		// No requests to answer, go back to rest floor
+		if (chosenDirection == 0 && cab.restFloor > cab.curfloor) {
+			chosenDirection = kElevationCabDirectionUp;
+		} else if (chosenDirection == 0 && cab.restFloor < cab.curfloor) {
+			chosenDirection = kElevationCabDirectionDown;
+		}
 	}
 
 	return chosenDirection;
+}
+
+int _cabShouldMove(int cabindex, cabdir_t direction)
+{
+	return _cabShouldMoveLong(cabindex, direction, 0);
 }
 
 #pragma mark - Master Functions
@@ -240,9 +239,20 @@ void elevation_tick()
 			}
 			cab->stopped = 1;
 		}
-		else if (cab->calls_out[cab->curfloor] == (cab->direction == kElevationCabDirectionUp ? kElevationCallGoUp : kElevationCallGoDown))
+		else if (cab->calls_out[cab->curfloor] > 0)
 		{
-			cab->calls_out[cab->curfloor] &= (cab->direction == kElevationCabDirectionUp ? ~kElevationCallGoUp : ~kElevationCallGoDown);
+			if (cab->calls_out[cab->curfloor] == kElevationCallGoUp && cab->direction == kElevationCabDirectionUp)
+			{
+				cab->calls_out[cab->curfloor] &= ~kElevationCallGoUp;
+			}
+			else if (cab->calls_out[cab->curfloor] == kElevationCallGoDown && cab->direction == kElevationCabDirectionDown)
+			{
+				cab->calls_out[cab->curfloor] &= ~kElevationCallGoDown;
+			}
+			else if (_cabShouldMoveLong(i, kElevationCabDirectionUp, 1) == 0)
+			{
+				cab->calls_out[cab->curfloor] = 0;
+			}
 
 			if (!cab->stopped) {
 				printf("Cab %d stopped at floor %d\n", i, cab->curfloor);
